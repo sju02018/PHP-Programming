@@ -1,0 +1,134 @@
+<?php
+#TODO: update form 인 경우, form 에 정보 표시
+if(isset($_GET[num])) { // Get 매개변수가 있냐 없냐
+    #TODO: MySQL 테이블에서, num에 해당하는 레코드 가져오기
+    $number = $_GET[num]; // get 매개변수 가져오기
+    $connect = @mysql_connect("localhost","LWJ","1234"); // mysql 실행
+    $db_con = @mysql_select_db("LWJ_db", $connect); // 디비 연동
+
+    $sql = "select * from tableboard_shop where num=$number;"; // 쿼리문 작성
+    $result = @mysql_query($sql, $connect); // 쿼리 실행
+
+    $bal = @mysql_fetch_row($result); // 해당 레코드 받아오기
+
+
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Table V01</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<!--===============================================================================================-->
+</head>
+<body>
+
+<div class="limiter">
+	<div class="container-table100">
+		<div class="wrap-table100">
+			<a href="index.php" style="border: 1px; padding: 10px; background: #36304a; display: block; width: 100px; text-align: center; border-radius: 10px; margin-bottom: 5px;"> Back </a>
+            <?php
+                if(isset($_GET[num])) { // 값이 있으면
+                    echo "<form method=\"POST\" action=\"function/update.php?num=$_GET[num]\">"; // update form 생성
+                } else {
+                    echo "<form method=\"POST\" action=\"function/insert.php\">"; // insert form 생성
+                }
+            ?>
+				<div class="table100">
+					<table>
+						<thead>
+						<tr class="table100-head">
+							<th class="column1">Date</th>
+							<th class="column2">Order ID</th>
+							<th class="column3">Name</th>
+							<th class="column4">Price</th>
+							<th class="column5">Quantity</th>
+							<th class="column6">Total</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr>
+                            <?php
+                            if(isset($_GET[num])) { // 디비에 존재하는 것을 클릭한 경우
+                                $total = (int)substr($bal[4], 1) * $bal[5]; // 총계 계산
+                                ?>
+                                <td class="column1"> <input name="date" type="text" value="<?php echo $bal[1] ?>" /> </td>
+                                <td class="column2"> <input name="order_id" type="number" value="<?php echo $bal[2] ?>" /> </td>
+                                <td class="column3"> <input name="name" type="text" value="<?php echo $bal[3] ?>" /> </td>
+                                <td class="column4"> <input name="price" type="number"  style="text-align: right;" value="<?php echo (int)substr($bal[4],1) ?>" /> </td>
+                                <td class="column5"> <input name="quantity" type="number" value="<?php echo $bal[5] ?>" style="text-align: right;" /> </td>
+                                <td class="column6"> $<span id="total"> <?php echo $total ?> </span> </td>
+                                <?php
+                            } else {
+                                ?>
+                                <td class="column1"> <input name="date" type="text" /> </td>
+                                <td class="column2"> <input name="order_id" type="number" /> </td>
+                                <td class="column3"> <input name="name" type="text" /> </td>
+                                <td class="column4"> <input name="price" type="number" placeholder="$" style="text-align: right;" /> </td>
+                                <td class="column5"> <input name="quantity" type="number" value="1" style="text-align: right;" /> </td>
+                                <td class="column6"> $<span id="total"></span> </td>
+                                <?php
+                            }
+                            ?>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+                <?php
+                    if(isset($_GET[num])) { // 디비 존재값이면  delete, update 버튼 생성
+                ?>
+                    <a href="function/delete.php?num=<? echo $_GET[num] ?>" style="border: 1px; padding: 10px; background: #36304a; display: block; width: 100px; text-align: center; float: right; border-radius: 10px; margin-top: 5px; margin-left: 5px; color: #007bff;"> Delete </a>
+                    <input style="border: 1px; padding: 10px; background: #36304a; display: block; width: 100px; text-align: center; float: right; border-radius: 10px; margin-top: 5px; margin-left: 5px; color: #007bff; cursor: pointer;" type="submit" value="Update">
+                <?php
+                    } else { // 아니면 insert 버튼 생성
+                ?>
+				    <input style="border: 1px; padding: 10px; background: #36304a; display: block; width: 100px; text-align: center; float: right; border-radius: 10px; margin-top: 5px; margin-left: 5px; color: #007bff; cursor: pointer;" type="submit" value="Insert">
+                <?php
+                    }
+                ?>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+
+
+<!--===============================================================================================-->
+<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+<script src="vendor/bootstrap/js/popper.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+<script src="vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+<script src="js/main.js"></script>
+<script>
+    $("input[name='price']").change(function () {
+        $('#total').text($("input[name='price']").val() * $("input[name='quantity']").val());
+    })
+
+    $("input[name='quantity']").change(function () {
+        $('#total').text($("input[name='price']").val() * $("input[name='quantity']").val());
+    })
+</script>
+
+</body>
+</html>
